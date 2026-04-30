@@ -8,40 +8,20 @@ import java.util.Scanner;
 
 public class Main {
 
-    // --- Modelo de produto ---
-    static class Produto {
-        int    id;
-        String nome;
-        String categoria; // MELHORIA: campo novo
-        String tamanho;   // MELHORIA: campo novo
-        double preco;
-        int    quantidade;
-
-        Produto(int id, String nome, String categoria, String tamanho, double preco, int quantidade) {
-            this.id         = id;
-            this.nome       = nome;
-            this.categoria  = categoria;
-            this.tamanho    = tamanho;
-            this.preco      = preco;
-            this.quantidade = quantidade;
-        }
-    }
-
     // --- Estado global ---
     static ArrayList<Produto> estoque   = new ArrayList<>();
+    static final int          LIMITE_BAIXO = 10;
     static Scanner            sc        = new Scanner(System.in);
-    static int                proximoId = 6;
-    static final int          LIMITE_BAIXO = 10; // MELHORIA: constante, fácil de mudar
 
     // ============================================================
     public static void main(String[] args) {
 
         // Produtos pré-carregados
-        estoque.add(new Produto(1, "Camiseta Basica",  "Camiseta", "M",  49.90, 30));
-        estoque.add(new Produto(2, "Calca Jeans Slim", "Calca",    "G",  129.90, 8));
-        estoque.add(new Produto(3, "Vestido Floral",   "Vestido",  "P",  89.90, 5));
-        estoque.add(new Produto(4, "Moletom Canguru",  "Moletom",  "GG", 149.90, 20));
-        estoque.add(new Produto(5, "Shorts Tactel",    "Shorts",   "M",  59.90, 2));
+        estoque.add(new Produto( "Camiseta Basica", "camisa", "M",  49.90, 30));
+        estoque.add(new Produto( "Calca Jeans Slim", "calca",    "G",  129.90, 8));
+        estoque.add(new Produto( "Vestido Floral", "vestido",  "P",  89.90, 5));
+        estoque.add(new Produto( "Moletom Canguru", "moletom",  "GG", 149.90, 20));
+        estoque.add(new Produto( "Shorts Tactel", "shorts",   "M",  59.90, 2));
 
         int opcao = 0;
 
@@ -61,7 +41,7 @@ public class Main {
             System.out.println("====================================");
             System.out.print("Opcao: ");
 
-            // MELHORIA: protege contra entrada inválida (texto no lugar de número)
+
             if (!sc.hasNextInt()) {
                 System.out.println("Por favor, digite um numero.");
                 sc.next();
@@ -92,15 +72,18 @@ public class Main {
             System.out.println("Nenhum produto cadastrado.");
             return;
         }
+
         System.out.println("\n--- PRODUTOS CADASTRADOS ---");
         System.out.printf("%-4s %-20s %-10s %-6s %9s %6s%n",
                 "ID", "Nome", "Categoria", "Tam", "Preco", "Qtd");
         System.out.println("-".repeat(60));
-        for (Produto p : estoque) {
+
+        estoque.forEach(p ->  {
             System.out.printf("%-4d %-20s %-10s %-6s R$%7.2f %6d%n",
                     p.id, p.nome, p.categoria, p.tamanho, p.preco, p.quantidade);
-        }
+        });
     }
+
 
     // ============================================================
     //  BUSCAR
@@ -111,12 +94,13 @@ public class Main {
         boolean encontrou = false;
 
         for (Produto p : estoque) {
-            if (p.nome.toLowerCase().contains(busca) ||
-                    p.categoria.toLowerCase().contains(busca)) {
+            if (p.nome.toLowerCase().contains(busca) || p.categoria.toLowerCase().contains(busca)) {
+
                 imprimirProduto(p);
                 encontrou = true;
             }
         }
+
         if (!encontrou) System.out.println("Nenhum produto encontrado para \"" + busca + "\".");
     }
 
@@ -127,7 +111,7 @@ public class Main {
         System.out.print("\nNome: ");
         String nome = sc.next();
 
-        System.out.println("Categoria:");
+        System.out.println("escolha uma categoria:");
         System.out.println(" 1-Camiseta  2-Calca  3-Vestido  4-Moletom  5-Shorts  6-Outro");
         System.out.print("Opcao: ");
         String[] cats = {"Camiseta","Calca","Vestido","Moletom","Shorts","Outro"};
@@ -146,14 +130,13 @@ public class Main {
         System.out.print("Quantidade inicial: ");
         int qty = sc.nextInt();
 
-        // MELHORIA: validação básica
         if (preco < 0 || qty < 0) {
             System.out.println("Preco e quantidade nao podem ser negativos.");
             return;
         }
 
-        estoque.add(new Produto(proximoId++, nome, categoria, tamanho, preco, qty));
-        System.out.println("Produto \"" + nome + "\" cadastrado com sucesso! ID: " + (proximoId - 1));
+        estoque.add(new Produto( nome, categoria, tamanho, preco, qty));
+        System.out.println("Produto \"" + nome + "\" cadastrado com sucesso! ID: ");
     }
 
     // ============================================================
@@ -162,11 +145,14 @@ public class Main {
     static void entradaEstoque() {
         listarProdutos();
         Produto p = selecionarProduto();
+
         if (p == null) return;
 
         System.out.print("Quantidade a adicionar: ");
         int qtd = sc.nextInt();
-        if (qtd <= 0) { System.out.println("Quantidade deve ser maior que zero."); return; }
+        if (qtd <= 0) { System.out.println("Quantidade deve ser maior que zero.");
+            return;
+        }
 
         p.quantidade += qtd;
         System.out.printf("Entrada registrada. Estoque de \"%s\": %d unidades.%n", p.nome, p.quantidade);
@@ -235,9 +221,6 @@ public class Main {
         if (!encontrou) System.out.println("Todos os produtos estao com estoque adequado.");
     }
 
-    // ============================================================
-    //  AUXILIARES
-    // ============================================================
     static Produto selecionarProduto() {
         System.out.print("\nDigite o ID do produto: ");
         if (!sc.hasNextInt()) { sc.next(); System.out.println("ID invalido."); return null; }
