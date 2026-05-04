@@ -1,27 +1,42 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// ============================================================
-//  URBAN THREAD SP — Sistema de Controle de Estoque
-//  Projeto Integrador — SENAC
-// ============================================================
-
 public class Main {
 
-    // --- Estado global ---
-    static ArrayList<Produto> estoque   = new ArrayList<>();
-    static final int          LIMITE_BAIXO = 10;
-    static Scanner            sc        = new Scanner(System.in);
+    static ArrayList<Produto> estoque = new ArrayList<>();
+    static final int LIMITE_BAIXO = 10;
+    static Scanner sc = new Scanner(System.in);
 
-    // ============================================================
+    // ========= PAUSA =========
+    static void pausar(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    // ========= ENTER + LOADING =========
+    static void pausarUsuario() {
+        System.out.println("\nPressione ENTER para continuar...");
+        sc.nextLine(); // limpa buffer
+        sc.nextLine(); // espera ENTER
+
+        System.out.print("Carregando");
+        for (int i = 0; i < 3; i++) {
+            pausar(400);
+            System.out.print(".");
+        }
+        System.out.println("\n");
+    }
+
     public static void main(String[] args) {
 
-        // Produtos pré-carregados
-        estoque.add(new Produto( "Camiseta Basica", "camisa", "M",  49.90, 30));
-        estoque.add(new Produto( "Calca Jeans Slim", "calca",    "G",  129.90, 8));
-        estoque.add(new Produto( "Vestido Floral", "vestido",  "P",  89.90, 5));
-        estoque.add(new Produto( "Moletom Canguru", "moletom",  "GG", 149.90, 20));
-        estoque.add(new Produto( "Shorts Tactel", "shorts",   "M",  59.90, 2));
+        estoque.add(new Produto("Camiseta Basica", "camisa", "M", 49.90, 30));
+        estoque.add(new Produto("Calca Jeans Slim", "calca", "G", 129.90, 8));
+        estoque.add(new Produto("Vestido Floral", "vestido", "P", 89.90, 5));
+        estoque.add(new Produto("Moletom Canguru", "moletom", "GG", 149.90, 20));
+        estoque.add(new Produto("Shorts Tactel", "shorts", "M", 59.90, 2));
 
         int opcao = 0;
 
@@ -41,32 +56,32 @@ public class Main {
             System.out.println("====================================");
             System.out.print("Opcao: ");
 
-
             if (!sc.hasNextInt()) {
                 System.out.println("Por favor, digite um numero.");
                 sc.next();
                 continue;
             }
+
             opcao = sc.nextInt();
 
+            System.out.println("\nProcessando...");
+            pausar(600);
+
             switch (opcao) {
-                case 1 -> listarProdutos();
-                case 2 -> buscarProduto();
-                case 3 -> cadastrarProduto();
-                case 4 -> entradaEstoque();
-                case 5 -> saidaEstoque();
-                case 6 -> atualizarProduto();
-                case 7 -> removerProduto();
-                case 8 -> verEstoqueBaixo();
-                case 9 -> System.out.println("\nAte mais! Obrigado por usar o sistema.");
-                default -> System.out.println("Opcao invalida. Tente novamente.");
+                case 1 -> { listarProdutos(); pausarUsuario(); }
+                case 2 -> { buscarProduto(); pausarUsuario(); }
+                case 3 -> { cadastrarProduto(); pausarUsuario(); }
+                case 4 -> { entradaEstoque(); pausarUsuario(); }
+                case 5 -> { saidaEstoque(); pausarUsuario(); }
+                case 6 -> { atualizarProduto(); pausarUsuario(); }
+                case 7 -> { removerProduto(); pausarUsuario(); }
+                case 8 -> { verEstoqueBaixo(); pausarUsuario(); }
+                case 9 -> System.out.println("\nAte mais!");
+                default -> System.out.println("Opcao invalida.");
             }
         }
     }
 
-    // ============================================================
-    //  LISTAR
-    // ============================================================
     static void listarProdutos() {
         if (estoque.isEmpty()) {
             System.out.println("Nenhum produto cadastrado.");
@@ -74,166 +89,150 @@ public class Main {
         }
 
         System.out.println("\n--- PRODUTOS CADASTRADOS ---");
-        System.out.printf("%-4s %-20s %-10s %-6s %9s %6s%n",
-                "ID", "Nome", "Categoria", "Tam", "Preco", "Qtd");
         System.out.println("-".repeat(60));
 
-        estoque.forEach(p ->  {
-            System.out.printf("%-4d %-20s %-10s %-6s R$%7.2f %6d%n",
+        for (Produto p : estoque) {
+            System.out.printf("%d | %s | %s | %s | R$%.2f | %d%n",
                     p.id, p.nome, p.categoria, p.tamanho, p.preco, p.quantidade);
-        });
+            pausar(150);
+        }
     }
 
-
-    // ============================================================
-    //  BUSCAR
-    // ============================================================
     static void buscarProduto() {
+        sc.nextLine(); // limpar buffer
         System.out.print("\nDigite o nome ou categoria: ");
-        String busca = sc.next().toLowerCase();
+        String busca = sc.nextLine().toLowerCase();
+
         boolean encontrou = false;
 
         for (Produto p : estoque) {
             if (p.nome.toLowerCase().contains(busca) || p.categoria.toLowerCase().contains(busca)) {
-
                 imprimirProduto(p);
+                pausar(200);
                 encontrou = true;
             }
         }
 
-        if (!encontrou) System.out.println("Nenhum produto encontrado para \"" + busca + "\".");
+        if (!encontrou) System.out.println("Nenhum produto encontrado.");
     }
 
-    // ============================================================
-    //  CADASTRAR
-    // ============================================================
     static void cadastrarProduto() {
+        sc.nextLine(); // limpar buffer
+
         System.out.print("\nNome: ");
-        String nome = sc.next();
-
-        System.out.println("escolha uma categoria:");
-        System.out.println(" 1-Camiseta  2-Calca  3-Vestido  4-Moletom  5-Shorts  6-Outro");
-        System.out.print("Opcao: ");
-        String[] cats = {"Camiseta","Calca","Vestido","Moletom","Shorts","Outro"};
-        int catIdx = sc.nextInt() - 1;
-        String categoria = (catIdx >= 0 && catIdx < cats.length) ? cats[catIdx] : "Outro";
-
-        System.out.println("Tamanho: 1-PP  2-P  3-M  4-G  5-GG  6-XGG");
-        System.out.print("Opcao: ");
-        String[] tams = {"PP","P","M","G","GG","XGG"};
-        int tamIdx = sc.nextInt() - 1;
-        String tamanho = (tamIdx >= 0 && tamIdx < tams.length) ? tams[tamIdx] : "M";
+        String nome = sc.nextLine();
 
         System.out.print("Preco: ");
         double preco = sc.nextDouble();
 
-        System.out.print("Quantidade inicial: ");
-        int qty = sc.nextInt();
+        System.out.print("Quantidade: ");
+        int qtd = sc.nextInt();
 
-        if (preco < 0 || qty < 0) {
-            System.out.println("Preco e quantidade nao podem ser negativos.");
-            return;
-        }
+        estoque.add(new Produto(nome, "Outro", "M", preco, qtd));
 
-        estoque.add(new Produto( nome, categoria, tamanho, preco, qty));
-        System.out.println("Produto \"" + nome + "\" cadastrado com sucesso! ID: ");
+        System.out.println("Salvando...");
+        pausar(800);
+
+        System.out.println("Produto cadastrado!");
     }
 
-    // ============================================================
-    //  ENTRADA
-    // ============================================================
     static void entradaEstoque() {
         listarProdutos();
         Produto p = selecionarProduto();
-
         if (p == null) return;
 
-        System.out.print("Quantidade a adicionar: ");
+        System.out.print("Qtd: ");
         int qtd = sc.nextInt();
-        if (qtd <= 0) { System.out.println("Quantidade deve ser maior que zero.");
-            return;
-        }
 
         p.quantidade += qtd;
-        System.out.printf("Entrada registrada. Estoque de \"%s\": %d unidades.%n", p.nome, p.quantidade);
+
+        System.out.println("Atualizando...");
+        pausar(600);
+
+        System.out.println("Estoque atualizado!");
     }
 
-    // ============================================================
-    //  SAIDA
-    // ============================================================
     static void saidaEstoque() {
         listarProdutos();
         Produto p = selecionarProduto();
         if (p == null) return;
 
-        System.out.print("Quantidade a retirar: ");
+        System.out.print("Qtd: ");
         int qtd = sc.nextInt();
 
-        if (qtd <= 0) { System.out.println("Quantidade deve ser maior que zero."); return; }
         if (qtd > p.quantidade) {
-            System.out.printf("Estoque insuficiente. Disponivel: %d unidades.%n", p.quantidade);
+            System.out.println("Estoque insuficiente!");
             return;
         }
 
         p.quantidade -= qtd;
-        System.out.printf("Saida registrada. Estoque de \"%s\": %d unidades.%n", p.nome, p.quantidade);
+
+        System.out.println("Atualizando...");
+        pausar(600);
+
+        System.out.println("Saida registrada!");
     }
 
-    // ============================================================
-    //  ATUALIZAR
-    // ============================================================
     static void atualizarProduto() {
         listarProdutos();
         Produto p = selecionarProduto();
         if (p == null) return;
 
-        System.out.print("Novo nome (atual: " + p.nome + "): ");
-        p.nome = sc.next();
-        System.out.print("Novo preco (atual: R$" + String.format("%.2f", p.preco) + "): ");
-        p.preco = sc.nextDouble();
-        System.out.println("Produto atualizado com sucesso.");
+        sc.nextLine(); // limpar buffer
+        System.out.print("Novo nome: ");
+        p.nome = sc.nextLine();
+
+        System.out.println("Salvando...");
+        pausar(600);
+
+        System.out.println("Atualizado!");
     }
 
-    // ============================================================
-    //  REMOVER
-    // ============================================================
     static void removerProduto() {
         listarProdutos();
         Produto p = selecionarProduto();
         if (p == null) return;
 
         estoque.remove(p);
-        System.out.println("Produto \"" + p.nome + "\" removido com sucesso.");
+
+        System.out.println("Removendo...");
+        pausar(600);
+
+        System.out.println("Removido!");
     }
 
-    // ============================================================
-    //  ESTOQUE BAIXO
-    // ============================================================
     static void verEstoqueBaixo() {
-        System.out.println("\n--- ESTOQUE BAIXO (abaixo de " + LIMITE_BAIXO + " unidades) ---");
+        System.out.println("\n--- ESTOQUE BAIXO ---");
+
         boolean encontrou = false;
+
         for (Produto p : estoque) {
             if (p.quantidade < LIMITE_BAIXO) {
                 imprimirProduto(p);
+                pausar(200);
                 encontrou = true;
             }
         }
-        if (!encontrou) System.out.println("Todos os produtos estao com estoque adequado.");
+
+        if (!encontrou) {
+            System.out.println("Todos os produtos estão com estoque ok.");
+        }
     }
 
     static Produto selecionarProduto() {
-        System.out.print("\nDigite o ID do produto: ");
-        if (!sc.hasNextInt()) { sc.next(); System.out.println("ID invalido."); return null; }
+        System.out.print("\nID: ");
         int id = sc.nextInt();
+
         for (Produto p : estoque) {
             if (p.id == id) return p;
         }
-        System.out.println("Produto com ID " + id + " nao encontrado.");
+
+        System.out.println("Nao encontrado.");
         return null;
     }
 
     static void imprimirProduto(Produto p) {
-        System.out.printf("ID: %d | %s | %s | Tam: %s | R$%.2f | Qtd: %d%n",
+        System.out.printf("%d | %s | %s | %s | R$%.2f | %d%n",
                 p.id, p.nome, p.categoria, p.tamanho, p.preco, p.quantidade);
     }
 }
