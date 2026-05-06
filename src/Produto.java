@@ -21,5 +21,9 @@ public class Produto {
         this.quantidade = quantidade;
     }
 
+    public void apresentarProduto(){
+        System.out.printf("ID: %d NOME: %s CATEGORIA: %s TAMANHO: %s  PRECO: %.2f QUANTIDADE: %d\n", id, nome, categoria, tamanho, preco, quantidade);
+    }
+
 
 }

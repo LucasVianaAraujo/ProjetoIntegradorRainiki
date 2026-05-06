@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -7,7 +8,6 @@ public class Main {
     static final int LIMITE_BAIXO = 10;
     static Scanner sc = new Scanner(System.in);
 
-    // ========= PAUSA =========
     static void pausar(int ms) {
         try {
             Thread.sleep(ms);
@@ -16,11 +16,33 @@ public class Main {
         }
     }
 
-    // ========= ENTER + LOADING =========
+    static void limparTerminal(){
+        try {
+            // Verifica o sistema operacional
+            if (System.getProperty("os.name").contains("Windows")) {
+
+                // No Windows, usa o cmd para chamar o comando interno 'cls'
+                new ProcessBuilder("cmd", "/c", "cls")
+                        .inheritIO() // Conecta o comando ao terminal atual
+                        .start()
+                        .waitFor(); // Espera a limpeza terminar antes de seguir
+            } else {
+                // No Linux ou macOS, chama o executável 'clear' diretamente
+                new ProcessBuilder("clear")
+                        .inheritIO()
+                        .start()
+                        .waitFor();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     static void pausarUsuario() {
         System.out.println("\nPressione ENTER para continuar...");
-        sc.nextLine(); // limpa buffer
-        sc.nextLine(); // espera ENTER
+        sc.nextLine();
+        sc.nextLine();
 
         System.out.print("Carregando");
         for (int i = 0; i < 3; i++) {
@@ -99,7 +121,7 @@ public class Main {
     }
 
     static void buscarProduto() {
-        sc.nextLine(); // limpar buffer
+        sc.nextLine();
         System.out.print("\nDigite o nome ou categoria: ");
         String busca = sc.nextLine().toLowerCase();
 
@@ -117,7 +139,7 @@ public class Main {
     }
 
     static void cadastrarProduto() {
-        sc.nextLine(); // limpar buffer
+        sc.nextLine();
 
         System.out.print("\nNome: ");
         String nome = sc.nextLine();
@@ -178,7 +200,7 @@ public class Main {
         Produto p = selecionarProduto();
         if (p == null) return;
 
-        sc.nextLine(); // limpar buffer
+        sc.nextLine();
         System.out.print("Novo nome: ");
         p.nome = sc.nextLine();
 
