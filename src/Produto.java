@@ -1,6 +1,6 @@
 public class Produto {
 
-    static int proximoId = 0;
+    private static int proximoId = 0;
 
     private int id;
     private String nome;
@@ -96,9 +96,7 @@ public class Produto {
         this.quantidade = quantidade;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() {return id;}
 
     public String getNome() {
         return nome;

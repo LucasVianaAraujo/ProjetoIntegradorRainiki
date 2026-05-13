@@ -79,7 +79,7 @@ public class Main {
             System.out.println("   URBAN THREAD SP — ESTOQUE");
             System.out.println("====================================");
             System.out.println(" 1 - Listar Produtos");
-            System.out.println(" 2 - Buscar Produto");
+            System.out.println(" 2 - Buscar Produto Por Nome");
             System.out.println(" 3 - Cadastrar Produto");
             System.out.println(" 4 - Entrada de Estoque");
             System.out.println(" 5 - Saida de Estoque");
@@ -139,6 +139,8 @@ public class Main {
         }
     }
 
+
+
     static void buscarProduto() {
 
         sc.nextLine();
@@ -150,8 +152,7 @@ public class Main {
 
         for (Produto p : estoque) {
 
-            if (p.getNome().toLowerCase().contains(busca) ||
-                    p.getCategoria().getNome().toLowerCase().contains(busca)) {
+            if (p.getNome().toLowerCase().contains(busca)) {
 
                 p.apresentarProduto();
                 encontrou = true;
@@ -316,14 +317,14 @@ public class Main {
 
         sc.nextLine();
 
-        System.out.print("\nCategoria: ");
-        String busca = sc.nextLine().toLowerCase();
+        System.out.print("\nID Categoria: ");
+        int busca = sc.nextInt();
 
         boolean encontrou = false;
 
         for (Produto p : estoque) {
 
-            if (p.getCategoria().getNome().toLowerCase().contains(busca)) {
+            if (p.getCategoria().getId() == busca) {
                 p.apresentarProduto();
                 encontrou = true;
             }
